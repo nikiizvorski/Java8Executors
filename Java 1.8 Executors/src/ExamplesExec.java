@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Created by nikiizvorski on 29/09/2017.
+ * Created by nikiizvorski on 29/09/2017
  *
  * An Executor that provides methods to manage termination and methods that can produce a Future for tracking progress of one or more asynchronous tasks.
  */
@@ -24,6 +24,38 @@ public class ExamplesExec {
         exampleInvokeSample();
 
         exampleScheduledExec();
+
+        exampleCompletable();
+    }
+
+    /**
+     * f you want to run some background task asynchronously and don’t want to return anything from the task, then you can use CompletableFuture.runAsync() method.
+     */
+    private static void exampleCompletable() {
+        // Using Lambda Expression
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            try {
+                getThreadName();
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println("I'll run in a separate thread than the main thread.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        try {
+            future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Small method to get the current thread used in this example
+     */
+    private static void getThreadName() {
+        String threadName = Thread.currentThread().getName();
+        System.out.println("Thread " + threadName);
     }
 
     /**
@@ -72,8 +104,7 @@ public class ExamplesExec {
                     .stream()
                     .map(future -> {
                         try {
-                            String threadName = Thread.currentThread().getName();
-                            System.out.println("Thread " + threadName);
+                            getThreadName();
                             return future.get();
                         }
                         catch (Exception e) {
@@ -100,8 +131,7 @@ public class ExamplesExec {
 
         Future<Integer> future = executor.submit(() -> {
             try {
-                String threadName = Thread.currentThread().getName();
-                System.out.println("Thread " + threadName);
+                getThreadName();
                 TimeUnit.SECONDS.sleep(2);
                 return 123;
             }
@@ -115,9 +145,6 @@ public class ExamplesExec {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
         }
-
-        // don't forget to shutdown the executor
-        executor.shutdown();
     }
 
     /**
@@ -132,8 +159,7 @@ public class ExamplesExec {
     private static void standartExec() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
-            String threadName = Thread.currentThread().getName();
-            System.out.println("Thread " + threadName);
+            getThreadName();
         });
 
         // don't forget to shutdown the executor
@@ -153,8 +179,7 @@ public class ExamplesExec {
     private static void callableExample() {
         Callable<Integer> task = () -> {
             try {
-                String threadName = Thread.currentThread().getName();
-                System.out.println("Thread " + threadName);
+                getThreadName();
                 TimeUnit.SECONDS.sleep(1);
                 return 123;
             }
@@ -183,3 +208,4 @@ public class ExamplesExec {
         executora.shutdown();
     }
 }
+
